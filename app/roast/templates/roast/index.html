@@ -1,0 +1,36 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Hello Roast</h3>
+<p><a href="{{ url_for('roast.beans') }}">Beans</a></p>
+<p><a href="{{ url_for('roast.roasters') }}">Roasters</a></p>
+
+
+<a class="btn btn-primary" href="{{ url_for('roast.roast_new') }}">Add New Roast</a>
+
+{% if roasts %}
+    <h3>Roasts</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Bean</th>
+                <th>Roaster</th>
+                <th>Roast Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for roast in roasts %}
+            <tr>
+                <td><a href="{{ url_for('roast.roast_detail', roast_id=roast.id) }}">{{ roast.bean.name }}</a></td>
+                <td>{{ roast.roaster.name }}</td>
+                <td>{{ roast.roast_datetime }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% endblock %}
+

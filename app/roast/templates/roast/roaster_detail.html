@@ -1,0 +1,20 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>{{ roaster.name }}</h3>
+<p>{{ roaster.description }}</p>
+
+<a class="btn btn-info" href="{{ url_for('roast.edit_roaster', roaster_id=roaster.id) }}">Edit Roaster</a>
+<a class="btn btn-primary" href="{{ url_for('roast.roasters') }}">Back to List</a>
+{% if roaster.roasts.all() %}
+<h4>Roasts for {{ roaster.name }}</h4>
+{% for roast in roaster.roasts %}
+
+{% endfor %}
+
+{% endif %}
+
+{% endblock %}
+
