@@ -3,96 +3,79 @@
 
 {% block content %}
 
-<div class="panel panel-default">
+<div class="panel panel-primary">
   <!-- Default panel contents -->
-  <div class="panel-heading">{{ roast.bean.name }}</div>
+  <div class="panel-heading">{{ roast.bean.name }} <span class="pull-right"><a href="{{ url_for('roast.roast_edit', roast_id=roast.id) }}">Edit</a></span></div>
   <div class="panel-body">
-    <p>Roasted with {{ roast.roaster.name }}</p>
+    <p>Roasted with {{ roast.roaster.name }} on {{ roast.formatted_datetime }}</p>
     <p>Notes: {{ roast.notes }}</p>
   </div>
 
-  <!-- Table -->
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>State</th>
-        <th>Variable</th>
-        <th>Value</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-          <td>Start</td>
-          <td>Time</td>
-          <td>{{ roast.start_time }}</td>
-      </tr>
-      <tr>
-          <td>Start</td>
-          <td>Temperature</td>
-          <td>{% if roast.start_temp %}{{ roast.start_temp }}&deg;{% endif %}</td>
-      </tr>
-      <tr>
-          <td>Start</td>
-          <td>Weight</td>
-          <td>{% if roast.start_weight %}{{ roast.start_weight }}g{% endif %}</td>
-      </tr>
-      <tr>
-          <td>First Crack</td>
-          <td>Start Time</td>
-          <td>{{ roast.first_crack_start_time }}</td>
-      </tr>
-      <tr>
-          <td>First Crack</td>
-          <td>End Time</td>
-          <td>{{ roast.first_crack_end_time }}</td>
-      </tr>
-      <tr>
-          <td>First Crack</td>
-          <td>Start Temp</td>
-          <td>{% if roast.first_crack_start_temp %}{{ roast.first_crack_start_temp }}&deg;{% endif %}</td>
-      </tr>
-      <tr>
-          <td>First Crack</td>
-          <td>End Temp</td>
-          <td>{% if roast.first_crack_end_temp %}{{ roast.first_crack_end_temp }}&deg;{% endif %}</td>
-      </tr>
-      <tr>
-          <td>Second Crack</td>
-          <td>Start Time</td>
-          <td>{% if roast.second_crack_start_time %}{{ roast.second_crack_start_time }}{% endif %}</td>
-      </tr>
-      <tr>
-          <td>Second Crack</td>
-          <td>End Time</td>
-          <td>{% if roast.second_crack_end_time %}{{ roast.second_crack_end_time }}{% endif %}</td>
-      </tr>
-      <tr>
-          <td>Second Crack</td>
-          <td>Start Temp</td>
-          <td>{% if roast.second_crack_start_temp %}{{ roast.second_crack_start_temp }}&deg;{% endif %}</td>
-      </tr>
-      <tr>
-          <td>Second Crack</td>
-          <td>End Temp</td>
-          <td>{% if roast.second_crack_end_temp %}{{ roast.second_crack_end_temp }}&deg;{% endif %}</td>
-      </tr>
-      <tr>
-          <td>End</td>
-          <td>Time</td>
-          <td>{{ roast.end_time }}</td>
-      </tr>
-      <tr>
-          <td>End</td>
-          <td>Temperature</td>
-          <td>{% if roast.end_temp %}{{ roast.end_temp }}&deg;{% endif %}</td>
-      </tr>
-      <tr>
-          <td>End</td>
-          <td>Weight</td>
-          <td>{% if roast.end_weight %}{{ roast.end_weight }}g{% endif %}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="panel panel-info">
+      <div class="panel-heading">Start</div>
+      <div class="panel-body">
+        <div class="col-xs-3">Time</div>
+        <div class="col-xs-9">{{ roast.start_time }}</div>
+        <div class="col-xs-3">Temperature</div>
+        <div class="col-xs-9">{% if roast.start_temp %}{{ roast.start_temp }}&deg;{% else %}&nbsp;{% endif %}</div>
+        <div class="col-xs-3">Weight</div>
+        <div class="col-xs-9">{% if roast.start_weight %}{{ roast.start_weight }}g{% else %}&nbsp;{% endif %}</div>
+      </div>
+  </div>
+
+  <div class="panel panel-info">
+      <div class="panel-heading">First Crack</div>
+      <div class="panel-body">
+        <div class="col-xs-3">Start Time</div>
+        <div class="col-xs-9">{% if roast.fc_start_time %}{{ roast.fc_start_time }}{% else %}&nbsp;{% endif %}</div>
+        <div class="col-xs-3">End Time</div>
+        <div class="col-xs-9">{% if roast.fc_end_time %}{{ roast.fc_end_time }}{% else %}&nbsp;{% endif %}</div>
+        <div class="col-xs-3">Start Temperature</div>
+        <div class="col-xs-9">{% if roast.fc_start_temp %}{{ roast.fc_start_temp }}&deg;{% else %}&nbsp;{% endif %}</div>
+        <div class="col-xs-3">End Temperature</div>
+        <div class="col-xs-9">{% if roast.fc_end_temp %}{{ roast.fc_end_temp }}&deg;{% else %}&nbsp;{% endif %}</div>
+      </div>
+  </div>
+
+  <div class="panel panel-info">
+      <div class="panel-heading">Second Crack</div>
+      <div class="panel-body">
+        <div class="col-xs-3">Start Time</div>
+        <div class="col-xs-9">{% if roast.sc_start_time %}{{ roast.sc_start_time }}{% else %}&nbsp;{% endif %}</div>
+        <div class="col-xs-3">End Time</div>
+        <div class="col-xs-9">{% if roast.sc_end_time %}{{ roast.sc_end_time }}{% else %}&nbsp;{% endif %}</div>
+        <div class="col-xs-3">Start Temperature</div>
+        <div class="col-xs-9">{% if roast.sc_start_temp %}{{ roast.sc_start_temp }}&deg;{% else %}&nbsp;{% endif %}</div>
+        <div class="col-xs-3">End Temperature</div>
+        <div class="col-xs-9">{% if roast.sc_end_temp %}{{ roast.sc_end_temp }}&deg;{% else %}&nbsp;{% endif %}</div>
+      </div>
+  </div>
+
+  <div class="panel panel-info">
+      <div class="panel-heading">End</div>
+      <div class="panel-body">
+        <div class="col-xs-3">Time</div>
+        <div class="col-xs-9">{{ roast.end_time }}</div>
+        <div class="col-xs-3">Temperature</div>
+        <div class="col-xs-9">{% if roast.end_temp %}{{ roast.end_temp }}&deg;{% endif %}</div>
+        <div class="col-xs-3">Weight</div>
+        <div class="col-xs-9">{% if roast.end_weight %}{{ roast.end_weight }}g{% endif %}</div>
+      </div>
+  </div>
+
+  <div class="panel panel-info">
+      <div class="panel-heading">Other</div>
+      <div class="panel-body">
+        <div class="col-xs-3">Time Elapsed</div>
+        <div class="col-xs-9">{{ roast.time_elapsed }} seconds</div>
+        <div class="col-xs-3">Weight Loss</div>
+        <div class="col-xs-9">{% if roast.weight_loss %}{{ roast.weight_loss }}g{% endif %}</div>
+        <div class="col-xs-3">Percentage Weight Loss</div>
+        <div class="col-xs-9">{% if roast.percent_weight_loss %}{{ roast.percent_weight_loss }}%{% endif %}</div>
+      </div>
+  </div>
+
+
 </div>
 
 {% endblock %}

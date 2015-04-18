@@ -4,15 +4,16 @@ from flask.ext.login import login_required, current_user
 from app import db
 from app.models import Bean, Roaster, Roast
 from .forms import BeanForm, RoasterForm, RoastForm, flash_form_errors
-from .utils import convert_times_to_second_diff
 from . import roast
 
 
 @roast.route('/', methods=['GET'])
 @login_required
 def index():
-    roasts = Roast.query.filter_by(user_id=current_user.id)
-    return render_template('roast/index.html', roasts=roasts)
+    roasts = Roast.query.filter_by(user_id=current_user.id).all()
+    beans = Bean.query.filter_by(user_id=current_user.id).all()
+    roasters = Roaster.query.filter_by(user_id=current_user.id).all()
+    return render_template('roast/index.html', roasts=roasts, beans=beans, roasters=roasters)
 
 
 @roast.route('/beans', methods=['GET', 'POST'])
@@ -119,6 +120,52 @@ def roast_detail(roast_id):
     roast = Roast.query.get(roast_id)
     return render_template('roast/roast_detail.html', roast=roast)
 
+@roast.route('/roasts/edit/<int:roast_id>', methods=['GET', 'POST'])
+@login_required
+def roast_edit(roast_id):
+    form = RoastForm(request.form)
+    beans = Bean.query.filter_by(user_id=current_user.id).all()
+    roasters = Roaster.query.filter_by(user_id=current_user.id).all()
+    form.bean.choices = [(str(bean.id), bean.name) for bean in beans]
+    form.roaster.choices = [(str(roaster.id), roaster.name) for roaster in roasters]
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            roast = Roast.query.get(roast_id)
+            roast.bean_id = form.bean.data
+            roast.roaster_id = form.roaster.data
+            roast.start_time = form.start_time.data
+            roast.start_temp = form.start_temp.data
+            roast.start_weight = form.start_weight.data
+            roast.fc_start_time = form.fc_start_time.data
+            roast.fc_start_temp = form.fc_start_temp.data
+            roast.fc_end_time = form.fc_end_time.data
+            roast.fc_end_temp = form.fc_end_temp.data
+            roast.sc_start_time = form.sc_start_time.data
+            roast.sc_start_temp = form.sc_start_temp.data
+            roast.sc_end_time = form.sc_end_time.data
+            roast.sc_end_temp = form.sc_end_temp.data
+            roast.end_time = form.end_time.data
+            roast.end_temp = form.end_temp.data
+            roast.end_weight = form.end_weight.data
+            roast.roast_datetime = datetime.strptime(form.roast_datetime.data, "%m/%d/%Y %I:%M:%S %p")
+            roast.notes = form.notes.data
+            db.session.add(roast)
+            db.session.commit()
+            return redirect(url_for('roast.roast_detail', roast_id=roast.id))
+        else:
+            flash_form_errors(form)
+    if request.method == 'GET':
+        roast = Roast.query.get(roast_id)
+        form = RoastForm(obj=roast)
+        form.roast_datetime.data = roast.formatted_datetime
+        form.bean.choices = [(str(bean.id), bean.name) for bean in beans]
+        form.roaster.choices = [(str(roaster.id), roaster.name) for roaster in roasters]
+
+    return render_template('roast/roast_new.html', form=form, beans=beans, roasters=roasters)
+
+
+
 
 @roast.route('/roasts/new', methods=['GET', 'POST'])
 @login_required
@@ -131,24 +178,23 @@ def roast_new():
 
     if request.method == 'POST':
         if form.validate_on_submit():
-            start_time = form.start_time.data
             roast_datetime = datetime.strptime(form.roast_datetime.data, "%m/%d/%Y %I:%M:%S %p")
             roast = Roast(
                 user_id=current_user.id,
                 bean_id=form.bean.data,
                 roaster_id=form.roaster.data,
-                start_time=0,
+                start_time=form.start_time.data,
                 start_temp=form.start_temp.data,
                 start_weight=form.start_weight.data,
-                first_crack_start_time=convert_times_to_second_diff(start_time, form.fc_start_time.data),
-                first_crack_start_temp=form.fc_start_temp.data,
-                first_crack_end_time=convert_times_to_second_diff(start_time, form.fc_end_time.data),
-                first_crack_end_temp=form.fc_end_temp.data,
-                second_crack_start_time=convert_times_to_second_diff(start_time, form.sc_start_time.data),
-                second_crack_start_temp=form.sc_start_temp.data,
-                second_crack_end_time=convert_times_to_second_diff(start_time, form.sc_end_time.data) if form.sc_end_time.data else None,
-                second_crack_end_temp=form.sc_end_temp.data,
-                end_time=convert_times_to_second_diff(start_time, form.end_time.data) if form.end_time.data else None,
+                fc_start_time=form.fc_start_time.data,
+                fc_start_temp=form.fc_start_temp.data,
+                fc_end_time=form.fc_end_time.data,
+                fc_end_temp=form.fc_end_temp.data,
+                sc_start_time=form.sc_start_time.data,
+                sc_start_temp=form.sc_start_temp.data,
+                sc_end_time=form.sc_end_time.data,
+                sc_end_temp=form.sc_end_temp.data,
+                end_time=form.end_time.data,
                 end_temp=form.end_temp.data,
                 end_weight=form.end_weight.data,
                 roast_datetime=roast_datetime,
@@ -156,7 +202,7 @@ def roast_new():
             )
             db.session.add(roast)
             db.session.commit()
-            return redirect(url_for('roast.index'))
+            return redirect(url_for('roast.roast_detail', roast_id=roast.id))
         else:
             flash_form_errors(form)
     return render_template('roast/roast_new.html', form=form, beans=beans, roasters=roasters)

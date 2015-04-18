@@ -3,14 +3,20 @@
 
 {% block content %}
 
-<h3>Hello Roast</h3>
-<p><a href="{{ url_for('roast.beans') }}">Beans</a></p>
-<p><a href="{{ url_for('roast.roasters') }}">Roasters</a></p>
+<h3>Hello {{ current_user.username }}</h3>
+{% if beans|length == 0 %}
+<p>You have no beans. Add some beans before adding a Roast.</p>
+{% endif %}
+<p><a href="{{ url_for('roast.beans') }}" class="btn btn-primary">View Beans</a></p>
+{% if roasters|length == 0 %}
+<p>You have no roasters. Add some roasters before adding a Roast.</p>
+{% endif %}
+<p><a href="{{ url_for('roast.roasters') }}" class="btn btn-primary">View Roasters</a></p>
 
 
-<a class="btn btn-primary" href="{{ url_for('roast.roast_new') }}">Add New Roast</a>
+<p><a class="btn btn-primary" href="{{ url_for('roast.roast_new') }}">Add New Roast</a></p>
 
-{% if roasts %}
+{% if roasts|length > 0 %}
     <h3>Roasts</h3>
     <table class="table table-bordered">
         <thead>
@@ -25,7 +31,7 @@
             <tr>
                 <td><a href="{{ url_for('roast.roast_detail', roast_id=roast.id) }}">{{ roast.bean.name }}</a></td>
                 <td>{{ roast.roaster.name }}</td>
-                <td>{{ roast.roast_datetime }}</td>
+                <td>{{ roast.formatted_datetime }}</td>
             </tr>
         {% endfor %}
         </tbody>
