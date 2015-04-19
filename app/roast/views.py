@@ -150,7 +150,6 @@ def roast_edit(roast_id):
             roast.end_weight = form.end_weight.data
             roast.roast_datetime = datetime.strptime(form.roast_datetime.data, "%m/%d/%Y %I:%M:%S %p")
             roast.notes = form.notes.data
-            db.session.add(roast)
             db.session.commit()
             return redirect(url_for('roast.roast_detail', roast_id=roast.id))
         else:
@@ -162,7 +161,7 @@ def roast_edit(roast_id):
         form.bean.choices = [(str(bean.id), bean.name) for bean in beans]
         form.roaster.choices = [(str(roaster.id), roaster.name) for roaster in roasters]
 
-    return render_template('roast/roast_new.html', form=form, beans=beans, roasters=roasters)
+    return render_template('roast/roast_edit.html', form=form, beans=beans, roasters=roasters, roast=roast)
 
 
 

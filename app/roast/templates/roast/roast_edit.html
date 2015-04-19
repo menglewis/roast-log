@@ -11,7 +11,7 @@
 
 <h3>Edit Roast</h3>
 
-<form method="POST" class="form-horizontal" action="{{ url_for('roast.roast_edit') }}">
+<form method="POST" class="form-horizontal" action="{{ url_for('roast.roast_edit', roast_id=roast.id) }}">
     {{ form.csrf_token }}
     <div class="form-group">
         {{ form.bean.label(class_="col-sm-2 control-label") }}
