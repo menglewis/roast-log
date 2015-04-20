@@ -1,0 +1,32 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Beans</h3>
+{% if beans %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Bean</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for bean in beans %}
+        <tr>
+            <td><a href="{{ url_for('roast.bean_detail', bean_id=bean.id) }}">{{ bean.name }}</a></td>
+            <td>{{ bean.description }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>You currently have no beans. Add some down below.</p>
+{% endif %}
+
+
+<p><a class="btn btn-primary" href="{{ url_for('roast.bean_new') }}">Add Bean</a></p>
+
+{% endblock %}
+

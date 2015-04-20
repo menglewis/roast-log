@@ -1,0 +1,32 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Roasters</h3>
+{% if roasters %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Roaster</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for roaster in roasters %}
+        <tr>
+            <td><a href="{{ url_for('roast.roaster_detail', roaster_id=roaster.id) }}">{{ roaster.name }}</a></td>
+            <td>{{ roaster.description }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>You currently have no Roasters. Add some down below.</p>
+{% endif %}
+
+
+<p><a class="btn btn-primary" href="{{ url_for('roast.roaster_new') }}">Add Roaster</a></p>
+
+{% endblock %}
+

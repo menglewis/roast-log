@@ -3,16 +3,34 @@
 
 {% block content %}
 
-<h3>{{ bean.name }}</h3>
-<p>{{ bean.description }}</p>
+<div class="panel panel-primary">
+  <!-- Default panel contents -->
+  <div class="panel-heading">{{ bean.name }} <span class="pull-right"><a href="{{ url_for('roast.edit_bean', bean_id=bean.id) }}">Edit</a></span></div>
+  <div class="panel-body">
+    <p>{{ bean.description }}</p>
+  </div>
+</div>
 
-<a class="btn btn-info" href="{{ url_for('roast.edit_bean', bean_id=bean.id) }}">Edit Bean</a>
-<a class="btn btn-primary" href="{{ url_for('roast.beans') }}">Back to List</a>
 {% if bean.roasts.all() %}
 <h4>Roasts for {{ bean.name }}</h4>
-{% for roast in bean.roasts %}
-
-{% endfor %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Bean</th>
+            <th>Roaster</th>
+            <th>Roast Date</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for roast in bean.roasts %}
+        <tr>
+            <td><a href="{{ url_for('roast.roast_detail', roast_id=roast.id) }}">{{ roast.bean.name }}</a></td>
+            <td>{{ roast.roaster.name }}</td>
+            <td>{{ roast.formatted_datetime }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
 {% endif %}
 

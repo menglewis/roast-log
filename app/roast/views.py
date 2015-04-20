@@ -10,15 +10,22 @@ from . import roast
 @roast.route('/', methods=['GET'])
 @login_required
 def index():
-    roasts = Roast.query.filter_by(user_id=current_user.id).all()
+    roasts = Roast.query.filter_by(user_id=current_user.id).order_by(Roast.roast_datetime.desc()).all()
     beans = Bean.query.filter_by(user_id=current_user.id).all()
     roasters = Roaster.query.filter_by(user_id=current_user.id).all()
     return render_template('roast/index.html', roasts=roasts, beans=beans, roasters=roasters)
 
 
-@roast.route('/beans', methods=['GET', 'POST'])
+@roast.route('/beans', methods=['GET'])
 @login_required
-def beans():
+def bean_list():
+    beans = Bean.query.filter_by(user_id=current_user.id).all()
+    return render_template('roast/bean_list.html', beans=beans)
+
+
+@roast.route('/beans/new', methods=['GET', 'POST'])
+@login_required
+def bean_new():
     form = BeanForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -29,11 +36,10 @@ def beans():
             )
             db.session.add(bean)
             db.session.commit()
-            return redirect(url_for('roast.beans'))
+            return redirect(url_for('roast.bean_detail', bean_id=bean.id))
         else:
             flash_form_errors(form)
-    beans = Bean.query.filter_by(user_id=current_user.id).all()
-    return render_template('roast/beans.html', beans=beans, form=form)
+    return render_template('roast/bean_new.html', form=form)
 
 
 @roast.route('/beans/<int:bean_id>', methods=['GET'])
@@ -41,6 +47,7 @@ def beans():
 def bean_detail(bean_id):
     bean = Bean.query.get(bean_id)
     return render_template('roast/bean_detail.html', bean=bean)
+
 
 @roast.route('/beans/edit/<int:bean_id>', methods=['GET', 'POST'])
 @login_required
@@ -58,12 +65,18 @@ def edit_bean(bean_id):
             flash_form_errors(form)
     bean = Bean.query.get(bean_id)
     form = BeanForm(obj=bean)
-    return render_template('roast/edit_bean.html', form=form, bean=bean)
+    return render_template('roast/bean_edit.html', form=form, bean=bean)
 
 
-@roast.route('/roasters', methods=['GET', 'POST'])
+@roast.route('/roasters', methods=['GET'])
 @login_required
-def roasters():
+def roaster_list():
+    roasters = Roaster.query.filter_by(user_id=current_user.id).all()
+    return render_template('roast/roaster_list.html', roasters=roasters)
+
+@roast.route('/roasters/new', methods=['GET', 'POST'])
+@login_required
+def roaster_new():
     form = RoasterForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -74,11 +87,10 @@ def roasters():
             )
             db.session.add(roaster)
             db.session.commit()
-            return redirect(url_for('roast.roasters'))
+            return redirect(url_for('roast.roaster_detail', roaster_id=roaster.id))
         else:
             flash_form_errors(form)
-    roasters = Roaster.query.filter_by(user_id=current_user.id).all()
-    return render_template('roast/roasters.html', roasters=roasters, form=form)
+    return render_template('roast/roaster_new.html', form=form)
 
 
 @roast.route('/roasters/<int:roaster_id>', methods=['GET'])
@@ -90,7 +102,7 @@ def roaster_detail(roaster_id):
 
 @roast.route('/roasters/edit/<int:roaster_id>', methods=['GET', 'POST'])
 @login_required
-def edit_roaster(roaster_id):
+def roaster_edit(roaster_id):
     if request.method == 'POST':
         form = RoasterForm(request.form)
         if form.validate_on_submit():
@@ -99,12 +111,12 @@ def edit_roaster(roaster_id):
             roaster.description = form.description.data
             db.session.add(roaster)
             db.session.commit()
-            return redirect(url_for('roast.beans'))
+            return redirect(url_for('roast.roaster_detail', roaster_id=roaster.id))
         else:
             flash_form_errors(form)
     roaster = Roaster.query.get(roaster_id)
     form = RoasterForm(obj=roaster)
-    return render_template('roast/edit_roaster.html', form=form, roaster=roaster)
+    return render_template('roast/roaster_edit.html', form=form, roaster=roaster)
 
 
 @roast.route('/roasts', methods=['GET', 'POST'])

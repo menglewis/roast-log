@@ -1,0 +1,16 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Edit Roaster</h3>
+
+<form method="POST" action="{{ url_for('roast.roaster_edit', roaster_id=roaster.id) }}">
+    {{ form.csrf_token }}
+    {{ form.name(placeholder="Name", class_="form-control") }}<br/>
+    {{ form.description(placeholder="Description", class_="form-control") }}<br/>
+    <input type="submit" value="Save" class="btn btn-primary">
+  </form>
+
+{% endblock %}
+

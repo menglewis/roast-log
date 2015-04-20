@@ -10,7 +10,7 @@ class User(UserMixin, db.Model):
 
     beans = db.relationship('Bean', backref='user', lazy='dynamic')
     roasters = db.relationship('Roaster', backref='user', lazy='dynamic')
-    roasts = db.relationship('Roast', backref='user', lazy='dynamic')
+    roasts = db.relationship('Roast', backref='user', lazy='dynamic', order_by='desc(Roast.roast_datetime)')
 
     def __init__(self, username=None, password=None):
         self.username = username
@@ -36,7 +36,7 @@ class Bean(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.Text, nullable=True)
-    roasts = db.relationship('Roast', backref='bean', lazy='dynamic')
+    roasts = db.relationship('Roast', backref='bean', lazy='dynamic', order_by='desc(Roast.roast_datetime)')
 
     def __repr__(self):
         return '<Bean %s>' % self.name
@@ -47,7 +47,7 @@ class Roaster(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.Text, nullable=True)
-    roasts = db.relationship('Roast', backref='roaster', lazy='dynamic')
+    roasts = db.relationship('Roast', backref='roaster', lazy='dynamic', order_by='desc(Roast.roast_datetime)')
 
     def __repr__(self):
         return '<Roaster %s>' % self.name
