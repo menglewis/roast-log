@@ -1,6 +1,11 @@
 
 {% extends "base.html" %}
 
+{% block css %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/nv.d3.min.css') }}" />
+{% endblock %}
+
 {% block content %}
 
 <div class="panel panel-primary">
@@ -75,8 +80,59 @@
       </div>
   </div>
 
-
+</div>
+<div id="chart">
+    <h4>Roast Temperature Over Time</h4>
+    <svg></svg>
 </div>
 
+{% endblock %}
+
+{% block js %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/d3.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/nv.d3.min.js') }}"></script>
+    <script type="text/javascript">
+        /*These lines are all chart setup.  Pick and choose which chart features you want to utilize. */
+        nv.addGraph(function() {
+          var chart = nv.models.lineChart()
+                        .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
+                        .showLegend(false)
+                        .showYAxis(true)        //Show the y-axis
+                        .showXAxis(true)        //Show the x-axis
+          ;
+
+          chart.xAxis     //Chart x-axis settings
+              .axisLabel('Time (s)')
+              .tickFormat(d3.format(',r'));
+
+          chart.yAxis     //Chart y-axis settings
+              .axisLabel('Temperature (F)')
+              .tickFormat(d3.format(',r'));
+
+
+          chart.tooltips(true);
+          chart.tooltipContent(function(key, y, e, graph) {
+              return '<p><strong>' + graph.point.label + '</strong><br>' +
+                      'Time: ' + graph.point.x + 's<br>Temperature: ' + graph.point.y + '&deg;F</p>'
+          });
+
+          /* Done setting the chart up? Time to render it!*/
+          var myData = [{
+              values: {{ roast.line_chart_data()|safe }}
+          }];
+
+          d3.select('#chart svg')    //Select the <svg> element you want to render the chart in.
+              .datum(myData)         //Populate the <svg> element with chart data...
+              .call(chart);          //Finally, render the chart!
+
+          //Update the chart when window resizes.
+          nv.utils.windowResize(function() { chart.update() });
+          return chart;
+        });
+
+
+
+    </script>
 {% endblock %}
 

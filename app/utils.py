@@ -11,3 +11,4 @@ def convert_times_to_second_diff(time1, time2):
     start = datetime.strptime(time1, "%I:%M:%S %p")
     end = datetime.strptime(time2, "%I:%M:%S %p")
     return (end - start).seconds
+

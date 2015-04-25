@@ -1,6 +1,8 @@
+import json
 from datetime import datetime
 from flask.ext.login import UserMixin
 from app import db, bcrypt
+from app.utils import convert_times_to_second_diff
 
 
 class User(UserMixin, db.Model):
@@ -30,6 +32,42 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User %s>' % self.username
 
+    def roasts_by_bean(self):
+        data = []
+        for bean in self.beans.all():
+            data.append({
+                'label': bean.name,
+                'value': len(bean.roasts.all()),
+            })
+        return json.dumps(data)
+
+    def roast_weight_by_bean(self):
+        data = []
+        for bean in self.beans.all():
+            data.append({
+                'label': bean.name,
+                'value': sum((roast.end_weight for roast in bean.roasts.all()))
+            })
+        return json.dumps(data)
+
+    def roasts_by_roaster(self):
+        data = []
+        for roaster in self.roasters.all():
+            data.append({
+                'label': roaster.name,
+                'value': len(roaster.roasts.all()),
+            })
+        return json.dumps(data)
+
+    def roast_weight_by_roaster(self):
+        data = []
+        for roaster in self.roasters.all():
+            data.append({
+                'label': roaster.name,
+                'value': sum((roast.end_weight for roast in roaster.roasts.all()))
+            })
+        return json.dumps(data)
+
 
 class Bean(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -37,6 +75,16 @@ class Bean(db.Model):
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.Text, nullable=True)
     roasts = db.relationship('Roast', backref='bean', lazy='dynamic', order_by='desc(Roast.roast_datetime)')
+
+    def roast_chart_data(self):
+        data = []
+        for roast in self.roasts.all():
+            data.append({
+                'x': roast.unix_datetime,
+                'y': roast.end_weight,
+                'label': roast.bean.name + " " + roast.roaster.name,
+            })
+        return json.dumps(data)
 
     def __repr__(self):
         return '<Bean %s>' % self.name
@@ -82,23 +130,23 @@ class Roast(db.Model):
 
     @property
     def time_elapsed(self):
-        return self.convert_times_to_second_diff(self.start_time, self.end_time)
+        return convert_times_to_second_diff(self.start_time, self.end_time)
 
     @property
     def first_crack_start(self):
-        return self.convert_times_to_second_diff(self.start_time, self.fc_start_time)
+        return convert_times_to_second_diff(self.start_time, self.fc_start_time)
 
     @property
     def first_crack_end(self):
-        return self.convert_times_to_second_diff(self.start_time, self.fc_end_time)
+        return convert_times_to_second_diff(self.start_time, self.fc_end_time)
 
     @property
     def second_crack_start(self):
-        return self.convert_times_to_second_diff(self.start_time, self.sc_start_time)
+        return convert_times_to_second_diff(self.start_time, self.sc_start_time)
 
     @property
     def second_crack_end(self):
-        return self.convert_times_to_second_diff(self.start_time, self.sc_end_time)
+        return convert_times_to_second_diff(self.start_time, self.sc_end_time)
 
     @property
     def weight_loss(self):
@@ -115,17 +163,47 @@ class Roast(db.Model):
     def formatted_datetime(self):
         return self.roast_datetime.strftime("%m/%d/%Y %I:%M:%S %p")
 
-    @staticmethod
-    def convert_times_to_second_diff(time1, time2):
-        """
-        Takes 2 time strings in the format "hh:mm:ss P" and calculates the difference in seconds
-        :param time1:
-        :param time2:
-        :return int: seconds
-        """
-        start = datetime.strptime(time1, "%I:%M:%S %p")
-        end = datetime.strptime(time2, "%I:%M:%S %p")
-        return (end - start).seconds
+    @property
+    def unix_datetime(self):
+        return (self.roast_datetime - datetime(1970, 1, 1)).total_seconds()
+
+    def line_chart_data(self):
+        data = []
+        data.append({
+            'x': 0,
+            'y': self.start_temp,
+            'label': 'Start',
+        })
+        if self.fc_start_time and self.fc_start_temp:
+            data.append({
+                'x': self.first_crack_start,
+                'y': self.fc_start_temp,
+                'label': 'First Crack Start',
+            })
+        if self.fc_end_time and self.fc_end_temp:
+            data.append({
+                'x': self.first_crack_end,
+                'y': self.fc_end_temp,
+                'label': 'First Crack End',
+            })
+        if self.sc_start_time and self.sc_start_temp:
+            data.append({
+                'x': self.second_crack_start,
+                'y': self.sc_start_temp,
+                'label': 'Second Crack Start',
+            })
+        if self.sc_end_time and self.sc_end_temp:
+            data.append({
+                'x': self.second_crack_end,
+                'y': self.sc_end_temp,
+                'label': 'Second Crack End',
+            })
+        data.append({
+            'x': self.time_elapsed,
+            'y': self.end_temp,
+            'label': 'End',
+        })
+        return json.dumps(data)
 
     def __repr__(self):
         return '<Roast %s>' % self.id

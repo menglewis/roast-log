@@ -8,3 +8,13 @@ body {
   margin: 0 auto;
 }
 
+#chart svg, #chart2 svg {
+    height: 500px;
+    width: 100%;
+}
+
+.nv-point {
+    stroke-opacity: 1!important;
+    stroke-width: 5px!important;
+    fill-opacity: 1!important;
+}
