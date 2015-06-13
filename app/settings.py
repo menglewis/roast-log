@@ -10,6 +10,7 @@ class Config(object):
 class ProdConfig(Config):
     '''Production configuration.'''
     SECRET_KEY = os.environ.get('SECRET_KEY', None)
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', None)
     DEBUG = False
 
 
